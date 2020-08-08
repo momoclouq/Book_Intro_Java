@@ -27,6 +27,7 @@ import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -53,7 +54,9 @@ public class Exercises extends Application{
         //Ex9 pane = new Ex9();
         //Ex10 pane = new Ex10();
         //Ex11 pane = new Ex11();
-        Ex12 pane = new Ex12();
+        //Ex12 pane = new Ex12();
+        //Ex13 pane = new Ex13();
+        Ex14 pane = new Ex14();
         
         //Create a scene and add the scene to the stage
         String title = pane.getName();
@@ -562,35 +565,26 @@ class Ex12 extends HBox implements Epane{
         getChildren().clear();
         //create panes
         setAlignment(Pos.BOTTOM_LEFT);
-        Pane p1 = createBlock("Apple", 20, Color.RED);
-        Pane p2 = createBlock("HTC", 26, Color.BLUE);
-        Pane p3 = createBlock("Samsung", 28, Color.GREEN);
-        Pane p4 = createBlock("Others", 26, Color.ORANGE);
+        Pane p1 = new Bar("Apple", 20, Color.RED);
+        p1.prefWidthProperty().bind(widthProperty().divide(4));
+        
+        Pane p2 = new Bar("HTC", 26, Color.BLUE);
+        p2.prefWidthProperty().bind(widthProperty().divide(4));
+        
+        Pane p3 = new Bar("Samsung", 28, Color.GREEN);
+        p3.prefWidthProperty().bind(widthProperty().divide(4));
+        
+        Pane p4 = new Bar("Others", 26, Color.ORANGE);
+        p4.prefWidthProperty().bind(widthProperty().divide(4));
+        setStyle("-fx-background-color: white");
+        setSpacing(10);
+        
+        
+        //setSpacing(20);
+        //Rectangle r1 = createRectangle(Color.RED);
+        //Rectangle r2 = createRectangle(Color.BLUE);
         
         getChildren().addAll(p1, p2, p3, p4);
-    }
-    
-    private Pane createBlock(String name, double percentage, Color color){
-        Pane pane = new Pane();
-        pane.prefHeightProperty().bind(new SimpleDoubleProperty(100));
-        pane.prefWidthProperty().bind(widthProperty().divide(4));
-        System.out.println("pane: " + pane.getHeight() + " - " + pane.getWidth());
-        //Create the rectangle
-        Rectangle rec = new Rectangle();
-        rec.xProperty().bind(new SimpleDoubleProperty(0));
-        rec.yProperty().bind(pane.heightProperty().subtract(pane.heightProperty().multiply(percentage/100)));
-        rec.widthProperty().bind(pane.widthProperty());
-        rec.heightProperty().bind(pane.heightProperty().multiply(percentage/100));
-        rec.setFill(color);
-        
-        //create text
-        Text text = new Text();
-        text.setText(name + " -- " + percentage + "%");
-        text.xProperty().bind(rec.xProperty().multiply(1.02));
-        text.yProperty().bind(rec.yProperty().multiply(0.98));
-        text.setFont(Font.font("Times New Roman", FontWeight.NORMAL, FontPosture.REGULAR, 15));
-        
-        return pane;
     }
     
     @Override
@@ -611,3 +605,208 @@ class Ex12 extends HBox implements Epane{
     }
 }
 
+class Bar extends Pane {
+    public Bar(String name, double percentage, Color color){
+        //Create the rectangle
+        Rectangle rec = new Rectangle();
+        rec.xProperty().bind(new SimpleDoubleProperty(0));
+        rec.yProperty().bind(heightProperty().subtract(heightProperty().multiply(percentage/100)));
+        rec.widthProperty().bind(widthProperty());
+        rec.heightProperty().bind(heightProperty().multiply(percentage).divide(100));
+        rec.setFill(color);
+        
+        //create text
+        Text text = new Text();
+        text.setText(name + " -- " + percentage + "%");
+        text.xProperty().bind(rec.xProperty());
+        text.yProperty().bind(rec.yProperty().subtract(10));
+        text.setFont(Font.font("Times New Roman", FontWeight.NORMAL, FontPosture.REGULAR, 15));
+        
+        getChildren().add(rec);
+        getChildren().add(text);
+    }
+}
+
+class Ex13 extends Pane implements Epane{
+    public void paint(){
+        getChildren().clear();
+        
+        Group arcGroup = new Group();
+        double startAngle = 0;
+        Arc arc1 = setArc("Apple", 20, Color.RED, startAngle);
+        Text t1 = setText("Apple", startAngle);
+        startAngle += (20.0/100 * 360);
+        
+        Arc arc2 = setArc("HTC", 26, Color.BLUE, startAngle);
+        Text t2 = setText("HTC", startAngle);
+        startAngle += (26.0/100 * 360);
+
+        Arc arc3 = setArc("Samsung", 28, Color.GREEN, startAngle);
+        Text t3 = setText("Samsung", startAngle);
+        startAngle += (28.0/100 * 360);
+
+        Arc arc4 = setArc("Others", 26, Color.ORANGE, startAngle);
+        Text t4 = setText("Others", startAngle);
+        //startAngle += 20/100 * 360;
+        
+        
+        setStyle("-fx-background-color: white");
+        arcGroup.getChildren().addAll(arc1, arc2, arc3, arc4, t1, t2, t3, t4);
+        
+        getChildren().add(arcGroup);
+    }
+    
+    private Arc setArc(String name, double percentage, Color color, double startAngle){
+        Arc arc = new Arc();
+        
+        double length = percentage/100 * 360;
+        arc.centerXProperty().bind(widthProperty().divide(2));
+        arc.centerYProperty().bind(heightProperty().divide(2));
+        arc.radiusXProperty().bind(widthProperty().multiply(0.8).divide(2));
+        arc.radiusYProperty().bind(arc.radiusXProperty());
+        arc.setStartAngle(startAngle);
+        arc.setLength(length);
+        arc.setType(ArcType.ROUND);
+        arc.setFill(color);
+        
+        return arc;
+    }
+    
+    private Text setText(String name, double startAngle){
+        Text text = new Text();
+        text.setText(name);
+        
+        DoubleProperty pX = new SimpleDoubleProperty(0);
+        DoubleProperty pY = new SimpleDoubleProperty(0);
+        DoubleProperty radius = new SimpleDoubleProperty(0);
+        pX.bind(widthProperty().divide(2));
+        pY.bind(heightProperty().divide(2));
+        radius.bind(widthProperty().multiply(0.8).divide(2));
+        
+        text.xProperty().bind(pX.add(radius.multiply(Math.cos(Math.toRadians(startAngle)))));
+        text.yProperty().bind(pY.subtract(radius.multiply(Math.sin(Math.toRadians(startAngle)))));
+        
+        return text;
+    }
+    
+    @Override
+    public void setWidth(double width){
+        super.setWidth(width);
+        paint();
+    }
+    
+    @Override
+    public void setHeight(double height){
+        super.setHeight(height);
+        paint();
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.13";
+    }
+}
+
+class Ex14 extends Pane implements Epane{
+    
+    public void paint(){
+        //clear the pane
+        getChildren().clear();
+        
+        //set up the points
+        DoubleProperty p1x = new SimpleDoubleProperty();
+        p1x.bind(widthProperty().multiply(0.15));
+        DoubleProperty p1y = new SimpleDoubleProperty();
+        p1y.bind(heightProperty().multiply(0.05));
+        
+        DoubleProperty p2x = new SimpleDoubleProperty();
+        p2x.bind(p1x.add(widthProperty().multiply(0.8)));
+        DoubleProperty p2y = new SimpleDoubleProperty();
+        p2y.bind(p1y);
+        
+        DoubleProperty p3x = new SimpleDoubleProperty();
+        p3x.bind(widthProperty().multiply(0.05));
+        DoubleProperty p3y = new SimpleDoubleProperty();
+        p3y.bind(p1y.add(heightProperty().multiply(0.2)));
+        
+        DoubleProperty p4x = new SimpleDoubleProperty();
+        p4x.bind(p3x.add(widthProperty().multiply(0.8)));
+        DoubleProperty p4y = new SimpleDoubleProperty();
+        p4y.bind(p3y);
+        
+        DoubleProperty p5x = new SimpleDoubleProperty();
+        p5x.bind(p1x);
+        DoubleProperty p5y = new SimpleDoubleProperty();
+        p5y.bind(p1y.add(heightProperty().multiply(0.7)));
+        
+        DoubleProperty p6x = new SimpleDoubleProperty();
+        p6x.bind(p2x);
+        DoubleProperty p6y = new SimpleDoubleProperty();
+        p6y.bind(p2y.add(heightProperty().multiply(0.7)));
+        
+        DoubleProperty p7x = new SimpleDoubleProperty();
+        p7x.bind(p3x);
+        DoubleProperty p7y = new SimpleDoubleProperty();
+        p7y.bind(p3y.add(heightProperty().multiply(0.7)));
+        
+        DoubleProperty p8x = new SimpleDoubleProperty();
+        p8x.bind(p4x);
+        DoubleProperty p8y = new SimpleDoubleProperty();
+        p8y.bind(p4y.add(heightProperty().multiply(0.7)));
+        
+        //prepare the values
+        double p1xv = p1x.doubleValue();
+        double p1yv = p1y.doubleValue();
+        double p2xv = p2x.doubleValue();
+        double p2yv = p2y.doubleValue();
+        double p3xv = p3x.doubleValue();
+        double p3yv = p3y.doubleValue();
+        double p4xv = p4x.doubleValue();
+        double p4yv = p4y.doubleValue();
+        double p5xv = p5x.doubleValue();
+        double p5yv = p5y.doubleValue();
+        double p6xv = p6x.doubleValue();
+        double p6yv = p6y.doubleValue();
+        double p7xv = p7x.doubleValue();
+        double p7yv = p7y.doubleValue();
+        double p8xv = p8x.doubleValue();
+        double p8yv = p8y.doubleValue();
+        
+        
+        //prepare the polygons
+        Polygon p1 = new Polygon(p1xv, p1yv, p2xv, p2yv, p4xv, p4yv, p3xv, p3yv );
+        p1.setFill(Color.TRANSPARENT);
+        p1.setStroke(Color.RED);
+        
+        Polygon p2 = new Polygon(p1xv, p1yv, p3xv, p3yv, p7xv, p7yv, p5xv, p5yv);
+        p2.setFill(Color.TRANSPARENT);
+        p2.setStroke(Color.BLACK);
+        
+        Polygon p3 = new Polygon(p2xv, p2yv, p4xv, p4yv, p8xv, p8yv, p6xv, p6yv);
+        p3.setFill(Color.TRANSPARENT);
+        p3.setStroke(Color.BLUE);
+        
+        Polygon p4 = new Polygon(p5xv, p5yv, p6xv, p6yv, p8xv, p8yv, p7xv, p7yv);
+        p4.setFill(Color.TRANSPARENT);
+        p4.setStroke(Color.GREEN);
+        
+        getChildren().addAll(p1, p2, p3, p4);
+    }
+    
+    @Override
+    public void setHeight(double height){
+        super.setHeight(height);
+        paint();
+    }
+    
+    @Override
+    public void setWidth(double width){
+        super.setWidth(width);
+        paint();
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.14";
+    }
+}
