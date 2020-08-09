@@ -8,6 +8,7 @@ package chapter14;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -56,11 +57,28 @@ public class Exercises extends Application{
         //Ex11 pane = new Ex11();
         //Ex12 pane = new Ex12();
         //Ex13 pane = new Ex13();
-        Ex14 pane = new Ex14();
+        //Ex14 pane = new Ex14();
+        //Ex15 pane = new Ex15();
+        //Ex16 pane = new Ex16();
+        //Ex17 pane = new Ex17();
+        //Ex18 pane = new Ex18();
+        //Ex19 pane = new Ex19();
+        //Ex20 pane = new Ex20();
+        //Ex21 pane  = new Ex21();
+        //Ex22 pane = new Ex22();
+        double center1X = 1 + Math.random() * 500;
+        double center1Y = 1 + Math.random() * 500;
+        double center2X = 1 + Math.random() * 500;
+        double center2Y = 1 + Math.random() * 500;
+        double width1 = 1 + Math.random() * 500;
+        double height1 = 1 + Math.random() * 500;
+        double width2 = 1 + Math.random() * 500;
+        double height2 = 1 + Math.random() * 500;
+        Ex23 pane = new Ex23(center1X, center1Y, center2X, center2Y, width1, height1, width2, height2);
         
         //Create a scene and add the scene to the stage
         String title = pane.getName();
-        Scene scene = new Scene(pane, 500, 500);
+        Scene scene = new Scene(pane, 700, 700);
         primaryStage.setScene(scene);
         primaryStage.setTitle(title);
         primaryStage.show();
@@ -808,5 +826,583 @@ class Ex14 extends Pane implements Epane{
     @Override
     public String getName(){
         return "Exercise 14.14";
+    }
+}
+
+class Ex15 extends StackPane implements Epane{
+    public void paint(){
+        getChildren().clear();
+        
+        //create the stop text
+        Text text = new Text("STOP");
+        text.setFont(Font.font("Times New Roman", FontWeight.BOLD, FontPosture.REGULAR, 60));
+        text.setFill(Color.WHITE);
+        
+        //create the sign
+        Polygon sign = new Polygon();
+        sign.setFill(Color.RED);
+        ObservableList<Double> list = sign.getPoints();
+        
+        double centerX = getWidth() / 2, centerY = getHeight() / 2;
+        double radius = Math.min(getWidth(), getHeight()) * 0.4;
+        
+        for(int i = 0; i < 8; i++){
+            list.add(centerX + radius * Math.cos(2 * i * Math.PI / 8 + Math.PI/8));
+            list.add(centerY - radius * Math.sin(2 * i * Math.PI / 8 + Math.PI/8));
+        }
+        
+        getChildren().add(sign);
+        getChildren().add(text);
+    }
+    
+    @Override
+    public void setWidth(double width){
+        super.setWidth(width);
+        paint();
+    }
+    
+    @Override
+    public void setHeight(double height){
+        super.setHeight(height);
+        paint();
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.15";
+    }
+}
+
+class Ex16 extends GridPane implements Epane{
+    public void paint(){
+        int size = 4;
+        //clear the pane
+        getChildren().clear();
+        
+        //prepare the gridpane
+        setAlignment(Pos.CENTER);
+        
+        //add the empty rectangle
+        for (int i = 0; i < size; i++){
+            for (int k = 0; k < size; k++){
+                add(createRec(size), i, k);
+            }
+        }
+        
+        
+    }
+    
+    private Pane createRec(int size){
+        Pane rec = new Pane();
+        //rec.setFill(Color.WHITE);
+        rec.setStyle("-fx-border-color: white blue red white; " +
+                "-fx-border-width: 1;");
+        rec.prefWidthProperty().bind(widthProperty().divide(size));
+        rec.prefHeightProperty().bind(heightProperty().divide(size));
+        return rec;
+    }
+    
+    @Override
+    public void setHeight(double height){
+        super.setHeight(height);
+        paint();
+    }
+    
+    @Override
+    public void setWidth(double width){
+        super.setWidth(width);
+        paint();
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.16";
+    }
+}
+
+class Ex17 extends Pane implements Epane{
+    public void paint(){
+        getChildren().clear();
+        
+        //draw the stand
+        Arc stand = drawStand();
+        
+        //draw the wholestand
+        Polyline stand2 = drawStand2();
+        
+        //draw the head
+        Circle head = drawHead();
+        
+        //draw the hands
+        Polyline hand1 = drawHand1();
+        Polyline hand2 = drawHand2();
+        
+        //draw the lower body
+        Polyline body = drawBody();
+        
+        //draw the last leg
+        Polyline leg = drawLeg();
+        
+        getChildren().addAll(stand, stand2, head, hand1, hand2, body, leg);
+    }
+    
+    private Arc drawStand(){
+        Arc stand = new Arc();
+        
+        stand.centerXProperty().bind(widthProperty().multiply(0.3));
+        stand.centerYProperty().bind(heightProperty().multiply(0.9));
+        stand.radiusXProperty().bind(widthProperty().multiply(0.15));
+        stand.radiusYProperty().bind(heightProperty().multiply(0.1));
+        stand.setStartAngle(0);
+        stand.setLength(180);
+        stand.setType(ArcType.OPEN);
+        stand.setStroke(Color.BLACK);
+        stand.setFill(Color.WHITE);
+        
+        return stand;
+    }
+    
+    private Polyline drawStand2(){
+        
+        DoubleProperty p1x = new SimpleDoubleProperty();
+        p1x.bind(widthProperty().multiply(0.3));
+        double p1xv = p1x.doubleValue();
+        DoubleProperty p1y = new SimpleDoubleProperty();
+        p1y.bind(heightProperty().multiply(0.8));
+        double p1yv = p1y.doubleValue();
+        
+        DoubleProperty p2x = new SimpleDoubleProperty();
+        p2x.bind(p1x);
+        double p2xv = p2x.doubleValue();
+        DoubleProperty p2y = new SimpleDoubleProperty();
+        p2y.bind(heightProperty().multiply(0.1));
+        double p2yv = p2y.doubleValue();
+        
+        DoubleProperty p3x = new SimpleDoubleProperty();
+        p3x.bind(p2x.add(widthProperty().multiply(0.5)));
+        double p3xv = p3x.doubleValue();
+        DoubleProperty p3y = new SimpleDoubleProperty();
+        p3y.bind(p2y);
+        double p3yv = p3y.doubleValue();
+        
+        DoubleProperty p4x = new SimpleDoubleProperty();
+        p4x.bind(p3x);
+        double p4xv = p4x.doubleValue();
+        DoubleProperty p4y = new SimpleDoubleProperty();
+        p4y.bind(heightProperty().multiply(0.2));
+        double p4yv = p4y.doubleValue();
+        
+        Polyline stand = new Polyline(p1xv, p1yv, p2xv, p2yv, p3xv, p3yv, p4xv, p4yv);
+       
+        return stand;
+    }
+    
+    private Circle drawHead(){
+        Circle head = new Circle();
+        
+        head.centerXProperty().bind(widthProperty().multiply(0.8));
+        head.centerYProperty().bind(heightProperty().multiply(0.3));
+        head.radiusProperty().bind(heightProperty().multiply(0.1));
+        head.setStroke(Color.BLACK);
+        head.setFill(Color.WHITE);
+        
+        return head;
+    }
+    
+    private Polyline drawHand1(){
+        
+        DoubleProperty radius = new SimpleDoubleProperty();
+        radius.bind(heightProperty().multiply(0.1));
+        DoubleProperty centerX = new SimpleDoubleProperty();
+        centerX.bind(widthProperty().multiply(0.8));
+        DoubleProperty centerY = new SimpleDoubleProperty();
+        centerY.bind(heightProperty().multiply(0.3));
+        
+        DoubleProperty p1x = new SimpleDoubleProperty();
+        DoubleProperty p1y = new SimpleDoubleProperty();
+        p1x.bind(centerX.add(radius.multiply(Math.cos(2 * Math.PI / 1.5))));
+        p1y.bind(centerY.subtract(radius.multiply(Math.sin(2 * Math.PI / 1.5))));
+        
+        double p2x = p1x.doubleValue() - getWidth() * 0.2;
+        double p2y = p1y.doubleValue() + getHeight() * 0.15;
+        
+        
+        Polyline hand1 = new Polyline(p1x.doubleValue(), p1y.doubleValue(), p2x, p2y);
+        
+        return hand1;
+    }
+    
+    private Polyline drawHand2(){
+        double radius = getHeight() * 0.1;
+        double centerX = getWidth() * 0.8;
+        double centerY = getHeight() * 0.3;
+        
+        double p1x = centerX + radius * Math.cos(2 * Math.PI / 1.2);
+        double p1y = centerY - radius * Math.sin(2 * Math.PI / 1.2);
+        double p2x = p1x + getWidth() * 0.2;
+        double p2y = p1y + getHeight() * 0.15;
+        
+        Polyline hand2 = new Polyline(p1x, p1y, p2x, p2y);
+        
+        return hand2;
+    }
+    
+    private Polyline drawBody(){
+        double radius = getHeight() * 0.1;
+        double centerX = getWidth() * 0.8;
+        double centerY = getHeight() * 0.3;
+        
+        double p1x = centerX;
+        double p1y = centerY + radius;
+        double p2x = centerX;
+        double p2y = p1y + getHeight() * 0.4;
+        double p3x = p2x + getWidth() * 0.15;
+        double p3y = p2y + getHeight() * 0.1;
+        
+        Polyline body = new Polyline(p1x, p1y, p2x, p2y, p3x, p3y);
+        
+        return body;
+    }
+    
+    private Polyline drawLeg(){
+        double radius = getHeight() * 0.1;
+        double centerX = getWidth() * 0.8;
+        double centerY = getHeight() * 0.3;
+        
+        double p1x = centerX;
+        double p1y = centerY + radius;
+        double p2x = centerX;
+        double p2y = p1y + getHeight() * 0.4;
+        double p3x = p2x - getWidth() * 0.15;
+        double p3y = p2y + getHeight() * 0.1;
+        
+        Polyline leg = new Polyline(p2x, p2y, p3x, p3y);
+        
+        return leg;
+    }
+    
+    @Override
+    public void setWidth(double width){
+        super.setWidth(width);
+        paint();
+    }
+    
+    @Override
+    public void setHeight(double height){
+        super.setHeight(height);
+        paint();
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.17";
+    }
+}
+
+class Ex18 extends Pane implements Epane{
+    public void paint(){
+        getChildren().clear();
+        Polyline polyline = new Polyline();
+        ObservableList<Double> list = polyline.getPoints();
+        double scaleFactor = 0.005;
+        for (int i = -100; i<=100; i++){
+            list.add((double) i + getWidth() / 2);
+            list.add((getHeight()/2 + (-1) * scaleFactor * i * i * i));
+        }
+        
+        Polyline xAxis = xAxis();
+        Polyline yAxis = yAxis();
+        
+        getChildren().addAll(polyline, xAxis, yAxis);
+        //setRotate(180);
+    }
+    
+    private Polyline xAxis(){
+        
+        double p1x = 0;
+        double p1y = getHeight() / 2;
+        double p2x = getWidth();
+        double p2y = getHeight() / 2;
+        
+        Polyline ax = new Polyline(p1x, p1y, p2x, p2y);
+        return ax;
+    }
+    
+    private Polyline yAxis(){
+        double p1x = getWidth() / 2;
+        double p1y = 0;
+        double p2x = getWidth() / 2;
+        double p2y = getHeight();
+        
+        Polyline ax = new Polyline(p1x, p1y, p2x, p2y);
+        return ax;
+    }
+    
+    @Override
+    public void setWidth(double width){
+        super.setWidth(width);
+        paint();
+    }
+    
+    @Override
+    public void setHeight(double height){
+        super.setHeight(height);
+        paint();
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.18";
+    }
+}
+
+class Ex19 extends Pane implements Epane{
+    public void paint(){
+        //clear the pane
+        getChildren().clear();
+        
+        //draw the axises
+        Polyline xAxis = xAxis();
+        Polyline yAxis = yAxis();
+        
+        //draw the functions
+        Polyline sinL = new Polyline();
+        sinL.setStroke(Color.RED);
+        ObservableList<Double> list = sinL.getPoints();
+        Polyline tanL = new Polyline();
+        tanL.setStroke(Color.BLUE);
+        ObservableList<Double> list2 = tanL.getPoints();
+        double scaleFactor = 100;
+        for (int x = -170; x <= 170; x++){
+            double width = x + getWidth() / 2;
+            double height = getHeight() / 2 + (-1) * scaleFactor * Math.sin((x / 100.0) * 2 * Math.PI);
+            list.add(width);
+            list.add(height);
+            
+            double value = x % 50;
+            if (value == 0) {
+                String output;
+                if (x == 0) output = "0";
+                else output = (x / 50) + "\u03c0";
+                Text text = new Text(width, height, output);
+                getChildren().add(text);
+            }
+            
+            list2.add(x + getWidth() / 2);
+            list2.add(getHeight() / 2 +  scaleFactor * Math.tan((x / 100.0) * 2 * Math.PI));
+        }
+       
+        
+        getChildren().addAll(xAxis, yAxis, tanL);
+    }
+    
+    private Polyline xAxis(){
+        
+        double p1x = 0;
+        double p1y = getHeight() / 2;
+        double p2x = getWidth();
+        double p2y = getHeight() / 2;
+        
+        Polyline ax = new Polyline(p1x, p1y, p2x, p2y);
+        ax.setStyle("-fx-border-width: 3");
+        return ax;
+    }
+    
+    private Polyline yAxis(){
+        double p1x = getWidth() / 2;
+        double p1y = 0;
+        double p2x = getWidth() / 2;
+        double p2y = getHeight();
+        
+        Polyline ax = new Polyline(p1x, p1y, p2x, p2y);
+        ax.setStyle("-fx-border-width: 3");
+        return ax;
+    }
+    
+    @Override
+    public void setWidth(double width){
+        super.setWidth(width);
+        paint();
+    }
+    
+    @Override
+    public void setHeight(double height){
+        super.setHeight(height);
+        paint();
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.19";
+    }
+}
+
+class Ex20 extends Pane implements Epane{
+    public Ex20(){
+        double startX = Math.random() * 500;
+        double startY = Math.random() * 500;
+        double endX = Math.random() * 500;
+        double endY = Math.random() * 500;
+        
+        drawArrowLine(startX, startY, endX, endY, this);
+    }
+    
+    public static void drawArrowLine(double startX, double startY, double endX, double endY, Pane pane){
+        // x+ by + c = 0
+        // b = x2 - x1 / y1 - y2, c = -x2 - b * y2
+        double b = (endX - startX) / (startY - endY);
+        double c = (-1) * endX - b * endY;
+        
+        /*
+        double p3x;
+        double p3y;
+        
+        if (startX < endX){
+            p3x = endX - 20;
+            p3y = ((-1) * c - p3x) / b ;
+        } else{
+            p3x = endX + 20;
+            p3y = ((-1) * c - p3x) / b ;
+            
+        }
+*/
+        double omega = Math.PI - Math.acos((endX - startX) / (Math.sqrt((endX - startX) * (endX - startX) + (endY - startY) * (endY -startY))));
+        
+        double startX3 = endX + Math.cos(Math.PI / 4 + omega) * 20;
+        double startY3 = endY - Math.sin(Math.PI / 4 + omega) * 20;
+        double startX4 = endX + Math.cos(-Math.PI / 4 + omega) * 20;
+        double startY4 = endY - Math.sin(-Math.PI / 4 + omega) * 20;
+  
+        Polyline line1 = new Polyline(endX, endY, startX3, startY3);
+        line1.setStroke(Color.BLUE);
+        
+        Polyline line2 = new Polyline(endX, endY, startX4, startY4);
+        
+        //the line
+        Polyline line = new Polyline(startX, startY,endX, endY);
+        line.setStroke(Color.RED);
+        
+        pane.getChildren().addAll(line, line1, line2);
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.20";
+    }
+}
+
+class Ex21 extends Pane implements Epane{
+    public Ex21(){
+        //create the circles
+        Circle c1 = new Circle();
+        double c1x = Math.random() * 500;
+        double c1y = Math.random() * 500;
+        c1.setCenterX(c1x);
+        c1.setCenterY(c1y);
+        c1.setRadius(15);
+        c1.setFill(Color.BLUE);
+        
+        Circle c2 = new Circle();
+        double c2x = Math.random() * 500;
+        double c2y = Math.random() * 500;
+        c2.setCenterX(c2x);
+        c2.setCenterY(c2y);
+        c2.setRadius(15);
+        c2.setFill(Color.BLUE);
+        
+        //Create the line
+        Polyline line = new Polyline(c1x, c1y, c2x, c2y);
+        
+        //create the text
+        double length = Math.sqrt((c1x - c2x) * (c1x - c2x) + (c1y - c2y) * (c1y - c2y));
+        double tx = (c1x + c2x) / 2 + 5;
+        double ty = (c1y + c2y) / 2 + 5;
+        Text text = new Text(tx, ty, Double.toString(length));
+        
+        getChildren().addAll(c1, c2, line, text);
+    }
+
+    @Override
+    public String getName(){
+        return "Exercise 14.21";
+    }
+}
+
+class Ex22 extends Pane implements Epane{
+    public Ex22(){
+        //draw the circles
+        Circle c1 = new Circle();
+        double c1x = Math.random() * 500;
+        double c1y = Math.random() * 500;
+        c1.setCenterX(c1x);
+        c1.setCenterY(c1y);
+        c1.setRadius(15);
+        c1.setFill(Color.BLUE);
+        
+        Circle c2 = new Circle();
+        double c2x = Math.random() * 500;
+        double c2y = Math.random() * 500;
+        c2.setCenterX(c2x);
+        c2.setCenterY(c2y);
+        c2.setRadius(15);
+        c2.setFill(Color.BLUE);
+        
+        //Create the line
+        Polyline line = new Polyline(c1x, c1y, c2x, c2y);
+        
+        getChildren().addAll(line, c1, c2);
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.22";
+    }
+}
+
+class Ex23 extends Pane implements Epane{
+    public Ex23(double center1X, double center1Y, double width1, double height1, double center2X, double center2Y, double width2, double height2){
+        //draw the rectangle
+        Rectangle r1 = new Rectangle(center1X - width1 / 2, center1Y - height1 / 2, width1, height1);
+        r1.setFill(Color.TRANSPARENT);
+        r1.setStroke(Color.BLACK);
+        Rectangle r2 = new Rectangle(center2X - width2 / 2, center2Y - height2 / 2, width2, height2);
+        r2.setFill(Color.TRANSPARENT);
+        r2.setStroke(Color.BLACK);
+        
+        //initialize things
+        double x1 = center1X - width1 / 2;
+        double y1 = center1Y - height1 / 2;
+        double x2 = center1X + width1 / 2;
+        double y2 = center1Y + height1 /2;
+        double x3 = center2X - width2 / 2;
+        double y3 = center2Y - height2 / 2;
+        double x4 = center2X + width2 / 2;
+        double y4 = center2Y + height2 /2;
+        
+        String output;
+        if (checkOverlap(x1, y1, x2, y2, x3, y3, x4, y4)){
+            if (checkContain(x1, y1, x2, y2, x3, y3, x4, y4)) output = "One rectangle is contained in another";
+            else output = "The rectangles overlap";
+        } else output = "The rectangles do not overlap";
+        
+        Text text = new Text(500, 600 , output);
+        
+        getChildren().addAll(r1, r2, text);
+    }
+    
+    private boolean checkOverlap(double x1,double y1, double x2, double y2, double x3, double y3, double x4, double y4){
+        if (x3 > x2 || x4 < x1 || y4 < y1 || y3 > y2) return false;
+        else return true;
+    }
+    
+    private boolean checkContain(double x1,double y1, double x2, double y2, double x3, double y3, double x4, double y4){
+        if (x1 < x3 && x2 > x4 && y1 < y3 && y2 > y4) return true;
+        if (x3 < x1 && x4 > x2 && y3 < y1 && y4 > y2) return true;
+        return false;
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.23";
     }
 }
