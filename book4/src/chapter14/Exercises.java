@@ -5,6 +5,8 @@
  */
 package chapter14;
 
+import java.util.ArrayList;
+import java.util.Random;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -17,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -66,6 +69,8 @@ public class Exercises extends Application{
         //Ex20 pane = new Ex20();
         //Ex21 pane  = new Ex21();
         //Ex22 pane = new Ex22();
+        
+        /*
         double center1X = 1 + Math.random() * 500;
         double center1Y = 1 + Math.random() * 500;
         double center2X = 1 + Math.random() * 500;
@@ -75,10 +80,29 @@ public class Exercises extends Application{
         double width2 = 1 + Math.random() * 500;
         double height2 = 1 + Math.random() * 500;
         Ex23 pane = new Ex23(center1X, center1Y, center2X, center2Y, width1, height1, width2, height2);
+        */
+        
+        /*
+        double p1x = 1 + Math.random() * 500;
+        double p1y = 1 + Math.random() * 500;
+        double p2x = 1 + Math.random() * 500;
+        double p2y = 1 + Math.random() * 500;
+        double p3x = 1 + Math.random() * 500;
+        double p3y = 1 + Math.random() * 500;
+        double p4x = 1 + Math.random() * 500;
+        double p4y = 1 + Math.random() * 500;
+        double p5x = 1 + Math.random() * 500;
+        double p5y = 1 + Math.random() * 500;
+        Ex24 pane = new Ex24(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y, p5x, p5y);
+        */
+        //Ex25 pane = new Ex25();
+        //Ex26 pane = new Ex26();
+        //Ex27 pane = new Ex27();
+        Ex28 pane = new Ex28();
         
         //Create a scene and add the scene to the stage
         String title = pane.getName();
-        Scene scene = new Scene(pane, 700, 700);
+        Scene scene = new Scene(pane, 500, 500);
         primaryStage.setScene(scene);
         primaryStage.setTitle(title);
         primaryStage.show();
@@ -1404,5 +1428,197 @@ class Ex23 extends Pane implements Epane{
     @Override
     public String getName(){
         return "Exercise 14.23";
+    }
+}
+
+class Ex24 extends Pane implements Epane{
+    public Ex24(double p1x, double p1y, double p2x, double p2y, double p3x, double p3y
+        ,double p4x, double p4y, double p5x, double p5y){
+        //draw the polygon of 4 points
+        Polygon polygon = new Polygon(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y);
+        polygon.setFill(Color.TRANSPARENT);
+        polygon.setStroke(Color.RED);
+        
+        //draw the circle for the fifth point
+        Circle circle = new Circle(p5x, p5y, 5);
+        circle.setStroke(Color.BLACK);
+        circle.setFill(Color.BLACK);
+        
+        //check if polygon contains the circle
+        String output;
+        if (polygon.contains(p5x, p5y)) output = "The point is in the polygon";
+        else output = "The point is not in the polygon";
+        
+        Text text = new Text(400, 600, output);
+        
+        getChildren().addAll(polygon, circle, text);
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.24";
+    }
+}
+
+class Ex25 extends Pane implements Epane{
+    public Ex25(){
+        //create a random circle
+        double centerX = 300 + Math.random() * 200;
+        double centerY = 300 + Math.random() * 200;
+        double radius = 20 + Math.random() * 200;
+        
+        Circle circle = new Circle(centerX, centerY, radius);
+        circle.setFill(Color.TRANSPARENT);
+        circle.setStroke(Color.BLACK);
+        
+        //draw the polygon
+        Polygon poly = new Polygon();
+        poly.setFill(Color.TRANSPARENT);
+        poly.setStroke(Color.PINK);
+        ObservableList<Double> list = poly.getPoints();
+        ArrayList<Double> angleList = new ArrayList<>();
+        Random rand = new Random();
+        getRandomNumbers(5, rand, angleList);
+        
+        for (int i = 0; i < 5; i++){
+            double angle = angleList.get(i);
+            
+            double newX = centerX + radius * Math.cos(Math.toRadians(angle));
+            double newY = centerY - radius * Math.sin(Math.toRadians(angle));
+            list.add(newX);
+            list.add(newY);
+        }
+       
+        getChildren().addAll(circle, poly);
+    }
+    
+    private void getRandomNumbers(int number, Random rand, ArrayList<Double> list){
+        double angle = 0;
+        
+        for (int i = 0; i < number; i++){
+            angle = angle + rand.nextDouble() * 200;
+            if (angle > 360) angle -= 360;
+            
+            list.add(angle);
+            for (int j = 0; j < list.size() - 1; j++){
+                if (list.get(j) >= list.get(list.size() - 1)) {
+                    list.add(j, list.get(list.size() - 1));
+                    list.remove(list.size() - 1);
+                    break;
+                }
+            }
+        }
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.25";
+    }
+}
+
+class Ex26 extends HBox implements Epane{
+    public Ex26(){
+        
+        ClockPane clock1 = new ClockPane(4, 20, 45);
+        ClockPane clock2 = new ClockPane(22, 46, 15);
+        
+
+        getChildren().addAll(clock1, clock2);
+        clock1.prefWidthProperty().bind(widthProperty().divide(2));
+        clock2.prefWidthProperty().bind(widthProperty().divide(2));
+        
+        setStyle("-fx-border-color: black");
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.26";
+    }
+}
+
+class Ex27 extends Pane implements Epane{
+    public Ex27(){
+        ClockPaneUp clock = new ClockPaneUp();
+        clock.prefWidthProperty().bind(widthProperty());
+        clock.prefHeightProperty().bind(heightProperty());
+        
+        clock.setSecondHandVisible(false);
+        
+        getChildren().add(clock);
+    }
+    @Override
+    public String getName(){
+        return "Exercise 14.27";
+    }
+}
+
+class Ex28 extends Pane implements Epane{
+    public void paint(){
+        //clear
+        getChildren().clear();
+        //draw the outer part
+        double p1x = getWidth() * (0.475);
+        double p1y = getHeight() * 0.2;
+        double p2x = p1x;
+        double p2y = p1y + getHeight() * 0.05;
+        double p3x = getWidth() * 0.2;
+        double p3y = p2y + getHeight() * 0.5;
+        double p4x = p3x;
+        double p4y = p3y + getHeight() * 0.2;
+        double p5x = getWidth() * (0.525);
+        double p5y = getHeight() * 0.2;
+        double p6x = p5x;
+        double p6y = p5y + getHeight() * 0.05;
+        double p7x = p3x + getWidth() * 0.6;
+        double p7y = p6y + getHeight() * 0.5;
+        double p8x = p7x;
+        double p8y = p7y + getHeight() * 0.2;
+        
+        Polyline bottle = new Polyline(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y, p8x, p8y, p7x, p7y, p6x, p6y, p5x, p5y);
+        bottle.setStroke(Color.BLACK);
+        
+        //add the content
+        int volume = 15;
+        double verticalP = 45.0 / (volume - 1) * getHeight() / 100;
+        double horizontalP = 60.0 / (volume + 1) * getWidth() / 100;
+        double startX = getWidth() / 2;
+        double startY = getHeight() * 0.275;
+        
+        for (int i = 0; i < volume; i++){
+            for (int j = 0; j <= i; j++){
+                Circle c = new Circle(startX + j * horizontalP , startY, 3);
+                c.setFill(Color.RED);
+                getChildren().add(c);
+                System.out.println(verticalP);
+                if (i == volume - 1){
+                    double endX = startX + j * horizontalP;
+                    double endY = startY + getHeight() * 0.225;
+                    
+                    Polyline line = new Polyline(startX + j * horizontalP , startY, endX, endY);
+                    getChildren().add(line);
+                }
+            }
+            startX = startX - horizontalP / 2;
+            startY = startY + verticalP;
+        }
+        
+        getChildren().addAll(bottle);
+    }
+    
+    @Override
+    public void setWidth(double width){
+        super.setWidth(width);
+        paint();
+    }
+    
+    @Override
+    public void setHeight(double height){
+        super.setHeight(height);
+        paint();
+    }
+    
+    @Override
+    public String getName(){
+        return "Exercise 14.28";
     }
 }
